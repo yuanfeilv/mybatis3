@@ -54,9 +54,13 @@ import org.apache.ibatis.type.TypeHandler;
  */
 public class XMLMapperBuilder extends BaseBuilder {
 
+  // XPath 解析器
   private final XPathParser parser;
+  // 构造器助手
   private final MapperBuilderAssistant builderAssistant;
+  //可被其他语句引用的可重复语句块的集合
   private final Map<String, XNode> sqlFragments;
+  // 资源引用的地址
   private final String resource;
 
   @Deprecated
@@ -83,6 +87,7 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   private XMLMapperBuilder(XPathParser parser, Configuration configuration, String resource, Map<String, XNode> sqlFragments) {
     super(configuration);
+    // 创建MapperBuilderAssistant 对象
     this.builderAssistant = new MapperBuilderAssistant(configuration, resource);
     this.parser = parser;
     this.sqlFragments = sqlFragments;
@@ -90,14 +95,20 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   public void parse() {
+    // 判断资源是否加载过
     if (!configuration.isResourceLoaded(resource)) {
+      // 解析mapper 节点
       configurationElement(parser.evalNode("/mapper"));
+      // 将mapper 标记为已加载
       configuration.addLoadedResource(resource);
       bindMapperForNamespace();
     }
 
+    // 解析 ResultMaps 标签
     parsePendingResultMaps();
+    // 解析cacheRef 标签
     parsePendingCacheRefs();
+    // 解析待定的sql 语句
     parsePendingStatements();
   }
 

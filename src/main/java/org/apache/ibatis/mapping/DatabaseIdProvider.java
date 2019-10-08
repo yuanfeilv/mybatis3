@@ -29,9 +29,10 @@ import javax.sql.DataSource;
  */
 public interface DatabaseIdProvider {
 
+  // 设置属性
   default void setProperties(Properties p) {
     // NOP
   }
-
+// 获取数据库标识
   String getDatabaseId(DataSource dataSource) throws SQLException;
 }

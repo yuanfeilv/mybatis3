@@ -237,7 +237,9 @@ public class Configuration {
 
   public void setVfsImpl(Class<? extends VFS> vfsImpl) {
     if (vfsImpl != null) {
+      // 设置vfsImpl 属性
       this.vfsImpl = vfsImpl;
+      //添加到 VFS 中的自定义 VFS 类的集合
       VFS.addImplClass(this.vfsImpl);
     }
   }
@@ -305,11 +307,12 @@ public class Configuration {
   public void setMapUnderscoreToCamelCase(boolean mapUnderscoreToCamelCase) {
     this.mapUnderscoreToCamelCase = mapUnderscoreToCamelCase;
   }
-
+// 添加资源加载集合
   public void addLoadedResource(String resource) {
     loadedResources.add(resource);
   }
 
+  // 资源是否加载过
   public boolean isResourceLoaded(String resource) {
     return loadedResources.contains(resource);
   }

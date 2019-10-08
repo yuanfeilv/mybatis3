@@ -31,6 +31,7 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 /**
  * @author Clinton Begin
  */
+// 基础构建类
 public abstract class BaseBuilder {
   protected final Configuration configuration;
   protected final TypeAliasRegistry typeAliasRegistry;
@@ -63,6 +64,7 @@ public abstract class BaseBuilder {
     return new HashSet<>(Arrays.asList(value.split(",")));
   }
 
+  // 解析对应的jdbc 类型
   protected JdbcType resolveJdbcType(String alias) {
     if (alias == null) {
       return null;
@@ -84,7 +86,7 @@ public abstract class BaseBuilder {
       throw new BuilderException("Error resolving ResultSetType. Cause: " + e, e);
     }
   }
-
+// 解析对应的 ParameterMode 类型
   protected ParameterMode resolveParameterMode(String alias) {
     if (alias == null) {
       return null;
@@ -95,13 +97,15 @@ public abstract class BaseBuilder {
       throw new BuilderException("Error resolving ParameterMode. Cause: " + e, e);
     }
   }
-
+  // 创建指定类型对的对象
   protected Object createInstance(String alias) {
+    // 获得对应的类型
     Class<?> clazz = resolveClass(alias);
     if (clazz == null) {
       return null;
     }
     try {
+      // 创建对象
       return resolveClass(alias).getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       throw new BuilderException("Error creating instance. Cause: " + e, e);
@@ -119,6 +123,7 @@ public abstract class BaseBuilder {
     }
   }
 
+  //  从 typeHandlerRegistry 中获取typeHandler对象
   protected TypeHandler<?> resolveTypeHandler(Class<?> javaType, String typeHandlerAlias) {
     if (typeHandlerAlias == null) {
       return null;
@@ -137,6 +142,7 @@ public abstract class BaseBuilder {
       return null;
     }
     // javaType ignored for injected handlers see issue #746 for full detail
+    //获得TypeHandler 对象
     TypeHandler<?> handler = typeHandlerRegistry.getMappingTypeHandler(typeHandlerType);
     if (handler == null) {
       // not in registry, create a new one
