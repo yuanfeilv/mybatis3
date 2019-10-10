@@ -96,12 +96,14 @@ import org.apache.ibatis.type.UnknownTypeHandler;
  * @author Kazuki Shimizu
  */
 public class MapperAnnotationBuilder {
-
+  // sql 操作集合
   private static final Set<Class<? extends Annotation>> SQL_ANNOTATION_TYPES = new HashSet<>();
+  // 操作提供者注解集合
   private static final Set<Class<? extends Annotation>> SQL_PROVIDER_ANNOTATION_TYPES = new HashSet<>();
 
   private final Configuration configuration;
   private final MapperBuilderAssistant assistant;
+  // 接口类
   private final Class<?> type;
 
   static {

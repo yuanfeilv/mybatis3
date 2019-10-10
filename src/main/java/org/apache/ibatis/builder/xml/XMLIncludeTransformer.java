@@ -44,6 +44,7 @@ public class XMLIncludeTransformer {
   }
 
   public void applyIncludes(Node source) {
+    // 创建variablesContext 并将 configurationVariables 添加其中
     Properties variablesContext = new Properties();
     Properties configurationVariables = configuration.getVariables();
     Optional.ofNullable(configurationVariables).ifPresent(variablesContext::putAll);
@@ -56,19 +57,26 @@ public class XMLIncludeTransformer {
    * @param variablesContext Current context for static variables with values
    */
   private void applyIncludes(Node source, final Properties variablesContext, boolean included) {
+    // 如果是include 标签
     if (source.getNodeName().equals("include")) {
+      // 获得sql 对应的节点
       Node toInclude = findSqlFragment(getStringAttribute(source, "refid"), variablesContext);
+      // 获得包含include 标签的属性
       Properties toIncludeContext = getVariablesContext(source, variablesContext);
+      // 递归调用applyIncludes 方法
       applyIncludes(toInclude, toIncludeContext, true);
       if (toInclude.getOwnerDocument() != source.getOwnerDocument()) {
         toInclude = source.getOwnerDocument().importNode(toInclude, true);
       }
+      // 将include 节点替换成sql 节点
       source.getParentNode().replaceChild(toInclude, source);
       while (toInclude.hasChildNodes()) {
         toInclude.getParentNode().insertBefore(toInclude.getFirstChild(), toInclude);
       }
+      // 移除include 标签
       toInclude.getParentNode().removeChild(toInclude);
     } else if (source.getNodeType() == Node.ELEMENT_NODE) {
+      // 如果在处理include 标签中
       if (included && !variablesContext.isEmpty()) {
         // replace variables in attribute values
         NamedNodeMap attributes = source.getAttributes();
@@ -77,6 +85,7 @@ public class XMLIncludeTransformer {
           attr.setNodeValue(PropertyParser.parse(attr.getNodeValue(), variablesContext));
         }
       }
+      // 遍历子节点，递归调用applyIncludes
       NodeList children = source.getChildNodes();
       for (int i = 0; i < children.getLength(); i++) {
         applyIncludes(children.item(i), variablesContext, included);
@@ -89,9 +98,12 @@ public class XMLIncludeTransformer {
   }
 
   private Node findSqlFragment(String refid, Properties variables) {
+    // 替换refid
     refid = PropertyParser.parse(refid, variables);
+    //获得完整的refid
     refid = builderAssistant.applyCurrentNamespace(refid, true);
     try {
+      // 获得sql 节点
       XNode nodeToInclude = configuration.getSqlFragments().get(refid);
       return nodeToInclude.getNode().cloneNode(true);
     } catch (IllegalArgumentException e) {
@@ -109,7 +121,9 @@ public class XMLIncludeTransformer {
    * @param inheritedVariablesContext Current context used for replace variables in new variables values
    * @return variables context from include instance (no inherited values)
    */
+  // 获得include 对应的Properties 对象
   private Properties getVariablesContext(Node node, Properties inheritedVariablesContext) {
+    // 获得include 标签的属性集合
     Map<String, String> declaredProperties = null;
     NodeList children = node.getChildNodes();
     for (int i = 0; i < children.getLength(); i++) {
