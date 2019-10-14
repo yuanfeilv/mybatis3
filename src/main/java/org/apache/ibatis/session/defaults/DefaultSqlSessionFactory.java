@@ -90,10 +90,13 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
   private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
     Transaction tx = null;
     try {
+      // 获得Environment 对象
       final Environment environment = configuration.getEnvironment();
+      // 获得Transaction 对象
       final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
       tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
       final Executor executor = configuration.newExecutor(tx, execType);
+      // 获得DefaultSqlSession 对象
       return new DefaultSqlSession(configuration, executor, autoCommit);
     } catch (Exception e) {
       closeTransaction(tx); // may have fetched a connection so lets call close()
@@ -105,6 +108,7 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
 
   private SqlSession openSessionFromConnection(ExecutorType execType, Connection connection) {
     try {
+      // 是否自动提交
       boolean autoCommit;
       try {
         autoCommit = connection.getAutoCommit();
@@ -113,10 +117,14 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
         // or databases won't support transactions
         autoCommit = true;
       }
+      // 获得Environment 对象
       final Environment environment = configuration.getEnvironment();
+      // 获得Transaction 对象
       final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
       final Transaction tx = transactionFactory.newTransaction(connection);
+      // 获得Executor 对象
       final Executor executor = configuration.newExecutor(tx, execType);
+      // 获得 DefaultSqlSession  对象
       return new DefaultSqlSession(configuration, executor, autoCommit);
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error opening session.  Cause: " + e, e);
