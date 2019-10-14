@@ -29,20 +29,25 @@ import org.apache.ibatis.session.Configuration;
 /**
  * @author Clinton Begin
  */
+//动态 SQL ，用于每次执行 SQL 操作时，记录动态 SQL 处理后的最终 SQL 字符串。
 public class DynamicContext {
 
   public static final String PARAMETER_OBJECT_KEY = "_parameter";
   public static final String DATABASE_ID_KEY = "_databaseId";
 
   static {
+    // 设置ognl 的属性访问器
     OgnlRuntime.setPropertyAccessor(ContextMap.class, new ContextAccessor());
   }
-
+  // 上下文的参数集合
   private final ContextMap bindings;
+  // 生成后的sql
   private final StringJoiner sqlBuilder = new StringJoiner(" ");
+  // 唯一编号
   private int uniqueNumber = 0;
 
   public DynamicContext(Configuration configuration, Object parameterObject) {
+    // 初始化bindings 参数
     if (parameterObject != null && !(parameterObject instanceof Map)) {
       MetaObject metaObject = configuration.newMetaObject(parameterObject);
       boolean existsTypeHandler = configuration.getTypeHandlerRegistry().hasTypeHandler(parameterObject.getClass());
@@ -50,6 +55,7 @@ public class DynamicContext {
     } else {
       bindings = new ContextMap(null, false);
     }
+    // 添加bindings 的默认值
     bindings.put(PARAMETER_OBJECT_KEY, parameterObject);
     bindings.put(DATABASE_ID_KEY, configuration.getDatabaseId());
   }

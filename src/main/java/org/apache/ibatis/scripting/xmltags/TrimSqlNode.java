@@ -30,9 +30,13 @@ import org.apache.ibatis.session.Configuration;
 public class TrimSqlNode implements SqlNode {
 
   private final SqlNode contents;
+//  前缀
   private final String prefix;
+  // 后缀
   private final String suffix;
+  //需要删除的前缀
   private final List<String> prefixesToOverride;
+  // 需要删除的后缀
   private final List<String> suffixesToOverride;
   private final Configuration configuration;
 
@@ -51,7 +55,9 @@ public class TrimSqlNode implements SqlNode {
 
   @Override
   public boolean apply(DynamicContext context) {
+    // 创建FilteredDynamicContext 对象
     FilteredDynamicContext filteredDynamicContext = new FilteredDynamicContext(context);
+    // 执行contents 的应用
     boolean result = contents.apply(filteredDynamicContext);
     filteredDynamicContext.applyAll();
     return result;

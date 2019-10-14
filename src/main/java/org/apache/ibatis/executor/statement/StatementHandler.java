@@ -36,12 +36,14 @@ public interface StatementHandler {
   void parameterize(Statement statement)
       throws SQLException;
 
+  // 批处理操作
   void batch(Statement statement)
       throws SQLException;
 
+  // 执行写操作
   int update(Statement statement)
       throws SQLException;
-
+// 执行读操作
   <E> List<E> query(Statement statement, ResultHandler resultHandler)
       throws SQLException;
 

@@ -126,18 +126,23 @@ public class MapperAnnotationBuilder {
   }
 
   public void parse() {
+
     String resource = type.toString();
+    // 判断资源是否加载过
     if (!configuration.isResourceLoaded(resource)) {
+      // 加载对应的xml
       loadXmlResource();
       configuration.addLoadedResource(resource);
       assistant.setCurrentNamespace(type.getName());
       parseCache();
       parseCacheRef();
+      //遍历每个方法，解析其上的注解
       Method[] methods = type.getMethods();
       for (Method method : methods) {
         try {
           // issue #237
           if (!method.isBridge()) {
+            // 解析注解
             parseStatement(method);
           }
         } catch (IncompleteElementException e) {
@@ -145,6 +150,7 @@ public class MapperAnnotationBuilder {
         }
       }
     }
+    // 解析待定的方法
     parsePendingMethods();
   }
 
@@ -170,6 +176,7 @@ public class MapperAnnotationBuilder {
     if (!configuration.isResourceLoaded("namespace:" + type.getName())) {
       String xmlResource = type.getName().replace('.', '/') + ".xml";
       // #1347
+      // 获得inputStream 对象
       InputStream inputStream = type.getResourceAsStream("/" + xmlResource);
       if (inputStream == null) {
         // Search XML mapper that is not in the module but in the classpath.
@@ -179,6 +186,7 @@ public class MapperAnnotationBuilder {
           // ignore, resource is not required
         }
       }
+      //创建XmlMapperBuilder 对象，执行解析
       if (inputStream != null) {
         XMLMapperBuilder xmlParser = new XMLMapperBuilder(inputStream, assistant.getConfiguration(), xmlResource, configuration.getSqlFragments(), type.getName());
         xmlParser.parse();
@@ -187,11 +195,15 @@ public class MapperAnnotationBuilder {
   }
 
   private void parseCache() {
+    // 获得类上的 @CacheNameSpace 注解
     CacheNamespace cacheDomain = type.getAnnotation(CacheNamespace.class);
     if (cacheDomain != null) {
+      // 获得各种属性
       Integer size = cacheDomain.size() == 0 ? null : cacheDomain.size();
       Long flushInterval = cacheDomain.flushInterval() == 0 ? null : cacheDomain.flushInterval();
+      // 获得Properties 属性
       Properties props = convertToProperties(cacheDomain.properties());
+      // 获得Cache 属性
       assistant.useNewCache(cacheDomain.implementation(), cacheDomain.eviction(), flushInterval, size, cacheDomain.readWrite(), cacheDomain.blocking(), props);
     }
   }
@@ -299,8 +311,11 @@ public class MapperAnnotationBuilder {
   }
 
   void parseStatement(Method method) {
+    // 获得参数的类型
     Class<?> parameterTypeClass = getParameterType(method);
+    // 获得languageDriver 对象
     LanguageDriver languageDriver = getLanguageDriver(method);
+    // 获得sqlSource 对象
     SqlSource sqlSource = getSqlSourceFromAnnotations(method, parameterTypeClass, languageDriver);
     if (sqlSource != null) {
       Options options = method.getAnnotation(Options.class);

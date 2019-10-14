@@ -560,9 +560,11 @@ public class Configuration {
    */
   public LanguageDriver getLanguageDriver(Class<? extends LanguageDriver> langClass) {
     if (langClass == null) {
+      // 获取默认的类
       return languageRegistry.getDefaultDriver();
     }
     languageRegistry.register(langClass);
+    // 获得languageDriver 类
     return languageRegistry.getDriver(langClass);
   }
 

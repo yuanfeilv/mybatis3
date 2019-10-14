@@ -21,6 +21,7 @@ package org.apache.ibatis.mapping;
  *
  * @author Clinton Begin
  */
+// 从mapper.xml 或者 注解上读取一条sql
 public interface SqlSource {
 
   BoundSql getBoundSql(Object parameterObject);
