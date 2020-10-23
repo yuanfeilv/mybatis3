@@ -42,6 +42,10 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     this.configuration = configuration;
   }
 
+  /**
+   * 获取数据库连接
+   * @return
+   */
   @Override
   public SqlSession openSession() {
     return openSessionFromDataSource(configuration.getDefaultExecutorType(), null, false);
@@ -95,8 +99,9 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
       // 获得Transaction 对象
       final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
       tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
+      ////获取执行器，这边获得的执行器已经代理拦截器的功能（见下面代码）
       final Executor executor = configuration.newExecutor(tx, execType);
-      // 获得DefaultSqlSession 对象
+      // 根据获取到的执行器创建sqlSession
       return new DefaultSqlSession(configuration, executor, autoCommit);
     } catch (Exception e) {
       closeTransaction(tx); // may have fetched a connection so lets call close()

@@ -288,8 +288,12 @@ public class DefaultSqlSession implements SqlSession {
     return configuration;
   }
 
+
   @Override
   public <T> T getMapper(Class<T> type) {
+    //mapperRegistry实质上是一个Map，里面注册了启动过程中解析的各种Mapper.xml
+    //mapperRegistry的key是接口的Class类型
+    //mapperRegistry的Value是MapperProxyFactory,用于生成对应的MapperProxy（动态代理类）
     return configuration.getMapper(type, this);
   }
 
